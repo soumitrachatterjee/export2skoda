@@ -2,6 +2,7 @@
    _Nifty utility to export existing media to folder structure supported by
    Skoda vehicles_
 
+## Motivation
 After much pain, I discovered that Skoda vehicles have stringent requirements
 regarding media folders on the SD card.
 
@@ -16,6 +17,8 @@ This utility will take a media directory (or several) and export the media
 files to a directory conforming to the above constraints.
 
 ## Usage
-   
+   ```
    export2skoda target-dir media-dir [media-dir]...
+   ```
+
 
