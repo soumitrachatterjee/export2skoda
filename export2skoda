@@ -1,0 +1,101 @@
+#!/usr/bin/python3
+
+#
+#  Skoda Music Aggregator
+#
+
+#
+# Constraints
+# -----------
+#  Max. 6500 files
+#  Max. 1024 directories
+#  Max. 1024 files/directory
+#
+class Constraints(object):
+    MAXFILES = 6500
+    MAXDIRS = 1024
+    MAXFILPERDIR = 1024
+
+#
+# Usage
+# -----
+#     export2skoda.py targetfolder musicfolder1 [musicfolder2]...
+#
+#     Populate <targetfolder> with endpoint directories of each <musicfolder>,
+#     with random music files from each musicfolder. Respect constraints.
+#
+
+import sys
+import os
+import ntpath
+import shutil
+ntpath.basename("a/b/c")
+
+if len(sys.argv) <= 1:
+   print("error: insufficient arguments")
+   print("usage: ", sys.argv[0], "DEST SRC [SRC]...")
+
+# Grab the target directory
+targetdir = sys.argv[1]
+print("Target directory: ", targetdir, Constraints.MAXFILES)
+print("The", len(sys.argv), "arguments are: " , str(sys.argv))
+
+# Routine get the basename of path safely
+def basename(path):
+   head, tail = ntpath.split(path)
+   return tail or ntpath.basename(head)
+
+# Target directory structure stats
+totalMediaFiles = 0
+filesInCurDir = 0
+curDirIdx = 0
+
+# Information
+lastMediaDest = ""
+
+# Iterate over all source directories, populating the target directory
+# structure
+srcIdx = 2
+while srcIdx < len(sys.argv) and totalMediaFiles < Constraints.MAXFILES and curDirIdx < Constraints.MAXDIRS:
+   # Pick the next working source directory
+   srcDir = sys.argv[srcIdx]
+
+   # Iterate over the files in the source directory, copying them to the target
+   # directory
+   print("Processing media source \"", srcDir, "\"")
+   with os.popen("find " + srcDir + " -type f") as mediaList:
+      for media in mediaList:
+         # Strip newline
+         media = media.rstrip()
+
+         # Check stats
+         if filesInCurDir >= Constraints.MAXFILPERDIR:
+            # Switch to new subdirectory
+            print("\tCopied ", filesInCurDir, "media files to target directory \"", lastMediaDest, "\"")
+            curDirIdx += 1
+            filesInCurDir = 0
+
+         # Prepare target subdirectory
+         destSubDir = targetdir + "/" + basename(srcDir) + str(curDirIdx)
+         os.makedirs(destSubDir, exist_ok = True)
+         lastMediaDest = destSubDir
+
+         # Copy media file to destination subdirectory
+         destMedia = destSubDir + "/" + basename(media)
+         #print("Copy ", media, " to targtet ", destMedia)
+         shutil.copy(media, destMedia)
+         filesInCurDir += 1
+         totalMediaFiles += 1
+
+   # Move onto the next source directory, if any
+   srcIdx += 1
+
+   # Changing to a new source forces a change in the destination sub directory
+   # as well; update stats
+   print("\tCopied ", filesInCurDir, "media files to target directory \"", lastMediaDest, "\"")
+   curDirIdx += 1
+   filesInCurDir = 0
+
+# Statistics
+print("Copied a total of", totalMediaFiles, "media files to target directory \"", targetdir, "\", distributed in", curDirIdx + 1, "sub-directories")
+
