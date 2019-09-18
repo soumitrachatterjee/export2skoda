@@ -1,0 +1,19 @@
+#!/bin/bash
+
+#
+# Cleanup a media directory by removing all thumbnail images and empty
+# files/directories
+#
+#  Usage:
+#     cleanup media-dir
+#
+
+#
+# WARNING: Specifying a wrong directory will wipe off all images!
+#
+echo "Removing thumbnail images..."
+find $@ -name \*.jpg -delete -print
+
+echo "Removing empty directories..."
+find $@ -empty -delete -print
+
