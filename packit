@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# Locate self
+BinDir=$(cd `dirname $0` >/dev/null 2>&1; pwd)
+Pack="$BinDir/export2skoda"
+
+# Source & destination base locations
+Src="/srv/HACaMSfs/Media/Audio/Music"
+Dst="/srv/HACaMSfs/Media/Audio/Music/ŠKODA"
+
+# Purge existing destination, if any
+rm -rf $Dst
+mkdir -p $Dst
+date >$Dst/.status
+
+# Export into target directory with specified constraints
+$Pack $Dst/Favourites/English $Src/Favourites/English       >>$Dst/.status 2>&1
+$Pack $Dst/Favourites/Hindi   $Src/Favourites/Hindi         >>$Dst/.status 2>&1
+$Pack $Dst/Secondary/Bengali  $Src/Collections/Bengali      >>$Dst/.status 2>&1
+$Pack $Dst/Secondary/Mashup   $Src/Collections/Hindi/Mashup >>$Dst/.status 2>&1
+$Pack $Dst/Secondary/Retro    $Src/Collections/Hindi/Retro  >>$Dst/.status 2>&1
+$Pack $Dst/Secondary/Rhea     $Src/Collections/Rhea         >>$Dst/.status 2>&1
+
+# Make destination fully permissive
+chmod -R 777 $Dst
+
+# Cleanup destination
+$BinDir/cleanup $Dst/Favourites $Dst/Secondary >>$Dst/.status 2>&1
+date >>$Dst/.status
+

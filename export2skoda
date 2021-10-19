@@ -37,8 +37,8 @@ if len(sys.argv) <= 1:
 
 # Grab the target directory
 targetdir = sys.argv[1]
-print("Target directory: ", targetdir, Constraints.MAXFILES)
-print("The", len(sys.argv), "arguments are: " , str(sys.argv))
+print("info: copying into target directory: ", targetdir)
+#print("The", len(sys.argv), "arguments are: " , str(sys.argv))
 
 # Routine get the basename of path safely
 def basename(path):
