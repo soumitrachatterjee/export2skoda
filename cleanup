@@ -21,6 +21,7 @@ find $@ -type f \! -iname \*.mp3    \
              -a \! -iname \*.wav    \
              -a \! -iname \*.ac3    \
              -a \! -iname \*.rm     \
+             -a \! -iname \*.cdg    \
              -a \! -iname \*.flac   \
              -a \! -iname \*.m4a -delete -print
 
