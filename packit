@@ -28,3 +28,8 @@ chmod -R 777 $Dst
 $BinDir/cleanup $Dst/Favourites $Dst/Secondary >>$Dst/.status 2>&1
 date >>$Dst/.status
 
+# Summary
+sz=`du -h $Dst | tail -1 | awk '{print $1}'`
+cnt=`find $Dst -type f | wc -l`
+echo "Copied $cnt files occupying $sz bytes to $Dst"
+
