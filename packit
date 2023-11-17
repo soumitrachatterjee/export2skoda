@@ -6,30 +6,48 @@ Pack="$BinDir/export2skoda"
 
 # Source & destination base locations
 Src="/srv/HACaMSfs/Media/Audio/Music"
-Dst="/srv/HACaMSfs/Media/Audio/Music/ŠKODA"
+Dst="/srv/HACaMSfs/Media/Portable"
 
 # Purge existing destination, if any
-rm -rf $Dst
-mkdir -p $Dst
+rm -rf $Dst/Music
+mkdir -p $Dst/Music
 date >$Dst/.status
 
+# Cleanup source
+$BinDir/cleanup $Src >>$Dst/.status 2>&1
+
 # Export into target directory with specified constraints
-$Pack $Dst/Favourites/English $Src/Favourites/English       >>$Dst/.status 2>&1
-$Pack $Dst/Favourites/Hindi   $Src/Favourites/Hindi         >>$Dst/.status 2>&1
-$Pack $Dst/Secondary/Bengali  $Src/Collections/Bengali      >>$Dst/.status 2>&1
-$Pack $Dst/Secondary/Mashup   $Src/Collections/Hindi/Mashup >>$Dst/.status 2>&1
-$Pack $Dst/Secondary/Retro    $Src/Collections/Hindi/Retro  >>$Dst/.status 2>&1
-$Pack $Dst/Secondary/Rhea     $Src/Collections/Rhea         >>$Dst/.status 2>&1
+$Pack $Dst/Music/English  $Src/Favourites/English       >>$Dst/.status 2>&1
+$Pack $Dst/Music/Foreign  $Src/Favourites/Foreign       >>$Dst/.status 2>&1
+$Pack $Dst/Music/Hindi    $Src/Favourites/Hindi         >>$Dst/.status 2>&1
+$Pack $Dst/Music/Mashup   $Src/Collections/Hindi/Mashup >>$Dst/.status 2>&1
+$Pack $Dst/Music/Retro    $Src/Collections/Hindi/Retro  >>$Dst/.status 2>&1
+$Pack $Dst/Music/Bengali  $Src/Favourites/Bengali       >>$Dst/.status 2>&1
+
+# Create category-wise & composite playlists
+HomeDir="$PWD"
+cd "$Dst/Music"
+Cats="English Hindi Foreign Mashup Retro Bengali"
+for category in $Cats; do
+  find $category -type f -iname \*.mp3  | shuf >$category.m3u
+done
+cat English.m3u Hindi.m3u               | shuf >Favourites.m3u
+cat Hindi.m3u Mashup.m3u Retro.m3u      | shuf >AllHindi.m3u
+cd "$HomeDir"
 
 # Make destination fully permissive
 chmod -R 777 $Dst
 
 # Cleanup destination
-$BinDir/cleanup $Dst/Favourites $Dst/Secondary >>$Dst/.status 2>&1
-date >>$Dst/.status
+$BinDir/cleanup $Dst/Music >>$Dst/.status 2>&1
 
 # Summary
 sz=`du -h $Dst | tail -1 | awk '{print $1}'`
 cnt=`find $Dst -type f | wc -l`
-echo "Copied $cnt files occupying $sz bytes to $Dst"
+echo "Total $cnt files (${sz}b)" >>$Dst/.status
+date >>$Dst/.status
+echo "Copied $cnt files occupying ${sz}b to $Dst"
+
+# Push notify
+/opt/HACaMS/bin/push-notify --sender "HACaMS" --action "portable media packed into" --result "$cnt files (${sz}b)"
 

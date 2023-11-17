@@ -15,15 +15,18 @@ echo "Removing thumbnail images..."
 find $@ -name \*.jpg -delete -print
 
 echo "Removing non-media files..."
-find $@ -type f \! -iname \*.mp3    \
-             -a \! -iname \*.mp4    \
-             -a \! -iname \*.wma    \
-             -a \! -iname \*.wav    \
+find $@ -type f                     \
+                \! -iname \*.mp3    \
              -a \! -iname \*.ac3    \
-             -a \! -iname \*.rm     \
              -a \! -iname \*.cdg    \
              -a \! -iname \*.flac   \
-             -a \! -iname \*.m4a -delete -print
+             -a \! -iname \*.m3u    \
+             -a \! -iname \*.m4a    \
+             -a \! -iname \*.mp4    \
+             -a \! -iname \*.rm     \
+             -a \! -iname \*.wav    \
+             -a \! -iname \*.wma    \
+             -delete -print
 
 echo "Removing empty directories..."
 find $@ -empty -delete -print
